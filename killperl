@@ -1,0 +1,87 @@
+#!/usr/bin/perl
+$VERSION = "1.00";
+
+# print usage if required
+if ( @ARGV > 0 ) {
+	print <<"USAGE";
+killperl $VERSION under perl $]
+
+Usage: killperl [-h]
+
+  killperl -h
+    Show help
+
+  killperl
+    Kill all perl programs
+USAGE
+	exit();
+}
+
+if ( $^O eq 'MSWin32' ) {    # Win32 kill
+	eval 'use Win32::Process; use Win32::Process::Info;';
+	die "Win32::Process and Win32::Process::Info is required" if $@;
+
+	foreach ( Win32::Process::Info->new( '', 'NT' )->GetProcInfo ) {
+		next unless $_->{Name} =~ /perl\.exe/i and $_->{ProcessId} != $$;
+		print "  Kill $_->{ProcessId} $_->{Name}\n";
+		Win32::Process::KillProcess( $_->{ProcessId}, 0 );
+	}
+} else {                     # POSIX kill
+	my $ps;
+	if ( $^O eq 'linux' ) {
+		$ps = `ps -e -o pid,command`;
+	} elsif ( $^O eq 'solaris' ) {
+		$ps = `ps -e -o pid,comm`;
+	} elsif ( $^O =~ /bsd$/ || $^O eq 'darwin' ) {
+		$ps = `ps -a -o pid,command`;
+	} else {
+		die "$^O is an unkown platform, please mail qjzhou\@hotmail.com!";
+	}
+	foreach ( split( /\n/, $ps ) ) {
+		next unless /^ *(\d+) (.*)$/;
+		my ( $pid, $cmd ) = ( $1, $2 );
+		next unless $cmd =~ /perl/ and $pid != $$;
+		print "  Kill $pid $cmd\n";
+		kill 9, $pid;
+	}
+}
+
+1;
+__END__
+
+=head1 NAME
+
+killperl - Utility to kill all perl programs
+
+=head1 SYNOPSIS
+
+killperl [-h]
+
+=head1 ABSTRACT
+
+Utility to kill all perl programs.
+
+=head1 DESCRIPTION
+
+  killperl -h
+    Show help
+
+  killperl
+    Kill all perl programs
+
+Supported platform: MSWin32, linux, solaris, darwin,
+openbsd, freebsd, netbsd.
+
+=head1 BUGS, REQUESTS, COMMENTS
+
+Please report any requests, suggestions or bugs via
+http://rt.cpan.org/NoAuth/ReportBug.html?Queue=killperl
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2004 Qing-Jie Zhou E<lt>qjzhou@hotmail.comE<gt>
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
