@@ -4,3 +4,4 @@ MANIFEST                This list of files
 META.yml                Module meta-data
 README                  Readme
 killperl                The script to kill all perl programs
+t/00base.t              Test scripts

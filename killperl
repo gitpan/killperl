@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-$VERSION = "1.00";
+$VERSION = "1.01";
 
 # print usage if required
 if ( @ARGV > 0 ) {
@@ -75,7 +75,7 @@ openbsd, freebsd, netbsd.
 =head1 BUGS, REQUESTS, COMMENTS
 
 Please report any requests, suggestions or bugs via
-http://rt.cpan.org/NoAuth/ReportBug.html?Queue=killperl
+L<http://bookbot.sourceforge.net>
 
 =head1 COPYRIGHT AND LICENSE
 
